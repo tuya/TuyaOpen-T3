@@ -1,3 +1,8 @@
+/*
+tuya_cloud_types.h
+Copyright(C),2018-2020, 涂鸦科技 www.tuya.comm
+*/
+
 #ifndef TUYA_CLOUD_TYPES_H
 #define TUYA_CLOUD_TYPES_H
 
@@ -93,20 +98,20 @@ typedef int bool_t;
     X |= temp_high;\
 }
 
-#if defined(LITTLE_END) && (LITTLE_END==1)
-#define UNI_NTOHS(X) WORD_SWAP(X)
-#define UNI_HTONS(X) WORD_SWAP(X)
-#define UNI_NTOHL(X) DWORD_SWAP(X)
-#define UNI_HTONL(X) DWORD_SWAP(X)
+#if defined(LITTLE_END) && (LITTLE_END == 1)
+#define UNI_NTOHS(X)  WORD_SWAP(X)
+#define UNI_HTONS(X)  WORD_SWAP(X)
+#define UNI_NTOHL(X)  DWORD_SWAP(X)
+#define UNI_HTONL(X)  DWORD_SWAP(X)
 #define UNI_NTOHLL(X) DDWORD_SWAP(X)
 #define UNI_HTONLL(X) DDWORD_SWAP(X)
 
 #else
 
-#define UNI_NTOHS(X) X
-#define UNI_HTONS(X) X
-#define UNI_NTOHL(X) X
-#define UNI_HTONL(X) X
+#define UNI_NTOHS(X)  X
+#define UNI_HTONS(X)  X
+#define UNI_NTOHL(X)  X
+#define UNI_HTONL(X)  X
 #define UNI_NTOHLL(X) X
 #define UNI_HTONLL(X) X
 
@@ -1240,6 +1245,7 @@ typedef enum {
     TUYA_UART_SYS = 0,
     TUYA_UART_USB,
     TUYA_UART_SDIO,
+    TUYA_UART_WCH,
     TUYA_UART_MAX_TYPE,
 } TUYA_UART_TYPE_E;
 
@@ -1327,43 +1333,12 @@ typedef struct {
     uint32_t interval_ms;
 } TUYA_WDOG_BASE_CFG_T;
 
-typedef enum  {
-    TUYA_DISPLAY_RGB = 0,
-    TUYA_DISPLAY_8080,
-    TUYA_DISPLAY_QSPI,
-    TUYA_DISPLAY_SPI,
-}TUYA_DISPLAY_TYPE_E;
-
 typedef enum{
     TUYA_DISPLAY_ROTATION_0,
     TUYA_DISPLAY_ROTATION_90,
     TUYA_DISPLAY_ROTATION_180,
     TUYA_DISPLAY_ROTATION_270,
 }TUYA_DISPLAY_ROTATION_E;
-
-typedef struct {
-    TUYA_GPIO_NUM_E   pin;
-    TUYA_GPIO_LEVEL_E active_level;
-} TUYA_DISPLAY_IO_CTRL_T;
-
-typedef struct {
-    TUYA_PWM_NUM_E       id;
-    TUYA_PWM_BASE_CFG_T  cfg;
-} TUYA_DISPLAY_PWM_CTRL_T;
-
-typedef enum  {
-    TUYA_DISP_BL_TP_NONE,
-    TUYA_DISP_BL_TP_GPIO,
-    TUYA_DISP_BL_TP_PWM,
-}TUYA_DISPLAY_BL_TYPE_E;
-
-typedef struct {
-    TUYA_DISPLAY_BL_TYPE_E    type;
-    union {
-        TUYA_DISPLAY_IO_CTRL_T   gpio;
-        TUYA_DISPLAY_PWM_CTRL_T  pwm;
-    };
-} TUYA_DISPLAY_BL_CTRL_T;
 
 typedef enum  {
     TUYA_DISP_INIT_RST = 0,
@@ -1396,6 +1371,7 @@ typedef enum {
     TUYA_PIXEL_FMT_RGB666,  
 	TUYA_PIXEL_FMT_RGB888,
     TUYA_PIXEL_FMT_MONOCHROME, /* binary pixel format, 1bit per pixel, 0 is black, 1 is white */    
+    TUYA_PIXEL_FMT_I2,
 } TUYA_DISPLAY_PIXEL_FMT_E;
 
 typedef enum {
