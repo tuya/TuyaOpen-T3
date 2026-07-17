@@ -40,6 +40,7 @@ set(include_dirs
     "include/wired"
     "include/display"
     "src/driver/tkl_display"
+    "tuyaopen"
     )
 
 string(REPLACE " " ";" TUYA_HEADER_DIR_LIST $ENV{TUYA_HEADER_DIR})
@@ -79,6 +80,7 @@ list(APPEND srcs
 	"src/driver/tkl_wakeup.c"
 	"src/cli_tuya_test.c"
     "src/bk_adapter.c"
+    "tuyaopen/tuyaopen_license.c"
 )
 
 file(GLOB_RECURSE utilities_srcs "$ENV{ARMINO_PATH}/../../tuyaos/tuyaos_adapter/include/utilities/src/*.c")

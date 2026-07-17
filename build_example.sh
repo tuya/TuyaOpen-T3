@@ -50,7 +50,6 @@ check_python_install() {
     fi
 
     python_version=$(${PYTHON_CMD} --version 2>&1 | cut -d' ' -f2 | cut -d. -f1-2)
-    formatted_version="python${python_version}-venv"
     echo "Python version: ${python_version}"
 
     major=$(echo "$python_version" | cut -d. -f1)
@@ -61,15 +60,21 @@ check_python_install() {
         exit 1
     fi
 
-    if apt list --installed | grep -q "^${formatted_version}/"; then
-        echo "${formatted_version} is installed, continuing with the script..."
+    # Probe the venv capability directly instead of matching the apt package
+    # name (e.g. python3.12-venv). The apt-name check is brittle: it breaks
+    # when the active python's minor version differs from the installed
+    # python3-venv package, on non-Debian distros, and on self-contained
+    # pythons (pyenv/conda/uv) that ship venv without an apt package.
+    if $PYTHON_CMD -c "import venv" >/dev/null 2>&1 && \
+       $PYTHON_CMD -m venv --help >/dev/null 2>&1; then
+        echo "venv module is available, continuing with the script..."
     else
-        echo "python3-venv is not installed. Please run:"
+        echo "python venv module is not available. Please run:"
         echo ""
         echo "$ sudo apt-get install python3-venv -y"
         echo ""
         exit 1
-    fi 
+    fi
 }
 
 enable_python_env() {
