@@ -146,6 +146,26 @@ export TUYA_HEADER_DIR=$HEADER_DIR
 export TUYA_LIBS_DIR=$LIBS_DIR
 export TUYA_LIBS=$LIBS
 
+# The root build compiles core (core_network.c -> lwIP) before this platform
+# build runs, and lwIP pulls in <sdkconfig.h> from the generated config tree.
+# Removing that tree on clean would leave the next build without the header,
+# so the generated sdkconfig.h is preserved across clean (same rule the T5AI
+# platform relies on from armino: clean must not drop sdkconfig.h).
+SDKCONFIG_GEN_DIR=./t3_os/tuya_build/${TARGET_PLATFORM}/config
+
+clean_generated_config() {
+    if [ -f "${SDKCONFIG_GEN_DIR}/sdkconfig.h" ]; then
+        SDKCONFIG_KEEP=$(mktemp)
+        cp "${SDKCONFIG_GEN_DIR}/sdkconfig.h" "${SDKCONFIG_KEEP}"
+        rm -rf ./t3_os/tuya_build
+        mkdir -p "${SDKCONFIG_GEN_DIR}"
+        cp "${SDKCONFIG_KEEP}" "${SDKCONFIG_GEN_DIR}/sdkconfig.h"
+        rm -f "${SDKCONFIG_KEEP}"
+    else
+        rm -rf ./t3_os/tuya_build
+    fi
+}
+
 # Remove TUYA APP OBJs first
 if [ -e "${APP_OBJ_PATH}/$APP_BIN_NAME/src" ]; then
 for i in `find ${APP_OBJ_PATH}/$APP_BIN_NAME/src -type d`; do
@@ -163,13 +183,13 @@ fi
 echo ${APP_BIN_NAME} > ${TOP_DIR}/.app
 if [ "$OLD_APP_BIN_NAME" != "$APP_BIN_NAME" ]; then
 	make clean -C ./t3_os/armino/
-	rm -rf ./t3_os/tuya_build
+	clean_generated_config
 	echo "AUTO CLEAN SUCCESS"
 fi
 
 if [ x$USER_CMD = "xclean" ];then
 	make clean -C ./t3_os/armino/
-	rm -rf ./t3_os/tuya_build
+	clean_generated_config
     rm -rf ./tuya_build_env
 	echo "*************************************************************************"
 	echo "************************CLEAN SUCCESS************************************"
