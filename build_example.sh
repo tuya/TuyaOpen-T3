@@ -131,11 +131,29 @@ disable_python_env() {
     fi
 }
 
-check_python_install ||  { echo "Failed to check python environment."; exit 1; }
+sdk_python_env_ready() {
+    command -v python3 >/dev/null 2>&1 || return 1
+    command -v cmake >/dev/null 2>&1 || return 1
+    command -v ninja >/dev/null 2>&1 || return 1
+    python3 -c "import cffi, click, click_option_group, cryptography, future, pycparser, Crypto, six" >/dev/null 2>&1 || return 1
+}
 
-bash t3_os/toolchain_get.sh $(pwd)/../tools || { echo "Failed to setup toolchain."; exit 1; } 
+bash t3_os/toolchain_get.sh $(pwd)/../tools || { echo "Failed to setup toolchain."; exit 1; }
 
-enable_python_env "tuya_build_env" || { echo "Failed to enable python virtual environment."; exit 1; }
+USING_LOCAL_VENV=0
+if [ -n "${VIRTUAL_ENV:-}" ] || [ -n "${OPEN_SDK_PYTHON:-}" ]; then
+    if sdk_python_env_ready; then
+        echo "Using active SDK Python environment: $(command -v python3)"
+    else
+        check_python_install || { echo "Failed to check python environment."; exit 1; }
+        enable_python_env "tuya_build_env" || { echo "Failed to enable python virtual environment."; exit 1; }
+        USING_LOCAL_VENV=1
+    fi
+else
+    check_python_install || { echo "Failed to check python environment."; exit 1; }
+    enable_python_env "tuya_build_env" || { echo "Failed to enable python virtual environment."; exit 1; }
+    USING_LOCAL_VENV=1
+fi
 
 export TUYA_APP_PATH=$APP_PATH
 export TUYA_APP_NAME=$APP_BIN_NAME
@@ -264,4 +282,6 @@ echo "*************************************************************************"
 echo "**********************COMPILE SUCCESS************************************"
 echo "*************************************************************************"
 
-disable_python_env "build_env"
+if [ "$USING_LOCAL_VENV" = "1" ]; then
+    disable_python_env "tuya_build_env"
+fi
