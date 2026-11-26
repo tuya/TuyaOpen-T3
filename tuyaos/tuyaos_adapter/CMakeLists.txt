@@ -81,6 +81,7 @@ list(APPEND srcs
 	"src/cli_tuya_test.c"
     "src/bk_adapter.c"
     "tuyaopen/tuyaopen_license.c"
+    "tuyaopen/netif_ops.c"
 )
 
 file(GLOB_RECURSE utilities_srcs "$ENV{ARMINO_PATH}/../../tuyaos/tuyaos_adapter/include/utilities/src/*.c")
